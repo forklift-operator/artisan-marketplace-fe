@@ -13,10 +13,11 @@ import { AuthService } from '../services/auth.service';
   styleUrl: './product-detail.component.css'
 })
 export class ProductDetailComponent {
-private productService = inject(ProductService);
+  private productService = inject(ProductService);
   private reviewService = inject(ReviewService);
   private route = inject(ActivatedRoute);
   authService = inject(AuthService);
+  private orderService = inject(OrderService);
 
   product = signal<Product | null>(null);
   reviews = signal<Review[]>([]);
@@ -93,6 +94,10 @@ private productService = inject(ProductService);
   }
 
   addToCart() {
-    alert(`Added "${this.product()!.name}" to cart! 🛒`);
+    if (!this.product()) return;
+
+    const product = this.product()!;
+    this.orderService.addItem(product.id!, product.name, product.price || 0, 1);
+    alert(`Added "${product.name}" to cart! 🛒`);
   }
 }
