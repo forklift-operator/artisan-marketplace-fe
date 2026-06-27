@@ -32,9 +32,9 @@ private productService = inject(ProductService);
   }
 
   loadProducts() {
-    this.productService.getAllProducts().subscribe({
+    const vendorId = this.authService.getLoggedInUserId();
+    this.productService.getAllProductsByVendorId(vendorId).subscribe({
       next: (data) => {
-        // In a real app, filter by vendor ID
         this.products.set(data);
       },
       error: (err) => console.error('Error loading products:', err)
@@ -73,17 +73,5 @@ private productService = inject(ProductService);
         error: (err) => console.error('Error deleting product:', err)
       });
     }
-  }
-
-  averageRating(): string {
-    return '4.8';
-  }
-
-  totalViews(): number {
-    return this.products().length * 250;
-  }
-
-  totalRevenue(): number {
-    return this.products().reduce((sum, p) => sum + (p.price * p.quantity * 0.5), 0);
   }
 }

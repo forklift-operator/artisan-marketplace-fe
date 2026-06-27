@@ -17,7 +17,7 @@ export interface ProductResponseDto {
 export interface ReviewResponseDto {
   id: number;
   productId: number;
-  rating: number;
+  stars: number;
   text: string;
   userId: number;
 }

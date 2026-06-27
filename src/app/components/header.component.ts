@@ -26,20 +26,20 @@ import { AuthService } from '../services/auth.service';
                class="hover:text-yellow-300 transition-colors duration-200">
               Browse
             </a>
-            <a *ngIf="(authService.currentUser$ | async)" routerLink="/my-orders" 
+            <a *ngIf="(authService.currentUser$ | async)" routerLink="/my-orders"
                routerLinkActive="text-yellow-300"
                class="hover:text-yellow-300 transition-colors duration-200">
               My Orders
             </a>
             <ng-container *ngIf="(authService.currentUser$ | async) as user">
               <a *ngIf="user?.role === 'VENDOR'"
-                 routerLink="/vendor/dashboard" 
+                 routerLink="/vendor/dashboard"
                  routerLinkActive="text-yellow-300"
                  class="hover:text-yellow-300 transition-colors duration-200">
                 Dashboard
               </a>
               <a *ngIf="user?.role === 'ADMIN'"
-                 routerLink="/admin" 
+                 routerLink="/admin"
                  routerLinkActive="text-yellow-300"
                  class="hover:text-yellow-300 transition-colors duration-200">
                 Admin
@@ -60,17 +60,17 @@ import { AuthService } from '../services/auth.service';
               </a>
 
               <!-- Logout Button -->
-              <button (click)="logout()" 
+              <button (click)="logout()"
                 class="btn-secondary bg-red-600 hover:bg-red-700 border-0 px-4 py-2 text-sm">
                 Logout
               </button>
             </div>
             <div *ngIf="!(authService.currentUser$ | async)" class="flex gap-2">
-              <a routerLink="/login" 
+              <a routerLink="/login"
                 class="btn-secondary px-4 py-2 text-sm">
                 Login
               </a>
-              <a routerLink="/register" 
+              <a routerLink="/register"
                 class="btn-primary px-4 py-2 text-sm">
                 Register
               </a>
