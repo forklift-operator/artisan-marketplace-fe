@@ -18,7 +18,7 @@ export interface ReviewResponseDto {
   id: number;
   productId: number;
   rating: number;
-  comment: string;
+  text: string;
   userId: number;
 }
 

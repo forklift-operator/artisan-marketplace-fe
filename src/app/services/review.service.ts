@@ -7,7 +7,7 @@ export interface Review {
   productId: number;
   userId: number;
   rating: number;
-  comment: string;
+  text: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -21,15 +21,15 @@ export class ReviewService {
   constructor(private http: HttpClient) {}
 
   getProductReviews(productId: number): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.apiUrl}/product/${productId}`);
+    return this.http.get<Review[]>(`http://localhost:9090/api/v1/products/${productId}/reviews`);
   }
 
   getReviewById(id: number): Observable<Review> {
     return this.http.get<Review>(`${this.apiUrl}/${id}`);
   }
 
-  createReview(review: Review): Observable<Review> {
-    return this.http.post<Review>(this.apiUrl, review);
+  createReview(review: Review, productId: number): Observable<Review> {
+    return this.http.post<Review>(`http://localhost:9090/api/v1/products/${productId}/reviews`, review);
   }
 
   updateReview(id: number, review: Review): Observable<Review> {
