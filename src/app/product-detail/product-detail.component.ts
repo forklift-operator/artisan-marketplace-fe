@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService, Product } from '../services/product.service';
 import { ReviewService, Review } from '../services/review.service';
 import { AuthService } from '../services/auth.service';
+import { OrderService } from '../services/order.service';
 
 @Component({
   selector: 'app-product-detail',
