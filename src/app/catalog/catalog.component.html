@@ -23,7 +23,7 @@
         class="form-control"
       >
       <button
-        *ngIf="(authService.currentUser$ | async)"
+        *ngIf="(authService.currentUser$ | async)?.role === 'VENDOR'"
         routerLink="/add-product"
         class="btn-primary"
       >
