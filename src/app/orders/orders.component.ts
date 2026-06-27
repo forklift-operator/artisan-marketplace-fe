@@ -5,18 +5,20 @@ import { OrderService, Order } from '../services/order.service';
 
 @Component({
   selector: 'app-orders',
+  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css'
 })
-export class OrdersComponent {
-private orderService = inject(OrderService);
+export class OrdersComponent implements OnInit {
+  private orderService = inject(OrderService);
 
   orders = signal<Order[]>([]);
   filteredOrders = signal<Order[]>([]);
   loading = signal(false);
 
-  statusFilters = ['All', 'PENDING', 'PROCESSING', 'SHIPPED', 'COMPLETED'];
+  // Updated filters to match the statuses returned by your BE getOrderHistory (COMPLETED, CANCELED)
+  statusFilters = ['All', 'COMPLETED', 'CANCELED'];
   selectedStatus = 'All';
 
   ngOnInit() {
@@ -25,14 +27,16 @@ private orderService = inject(OrderService);
 
   loadOrders() {
     this.loading.set(true);
-    this.orderService.getAllOrders().subscribe({
+
+    // Changed from getAllOrders() to getOrderHistory()
+    this.orderService.getOrderHistory().subscribe({
       next: (data) => {
         this.orders.set(data);
         this.filterByStatus('All');
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Error loading orders:', err);
+        console.error('Error loading order history:', err);
         this.loading.set(false);
       }
     });
@@ -55,7 +59,7 @@ private orderService = inject(OrderService);
       'PROCESSING': 'bg-blue-100 text-blue-800',
       'SHIPPED': 'bg-purple-100 text-purple-800',
       'COMPLETED': 'bg-green-100 text-green-800',
-      'CANCELLED': 'bg-red-100 text-red-800'
+      'CANCELED': 'bg-red-100 text-red-800' // Fixed typo: CANCELED with one 'L' matches your Java Status Enum
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   }

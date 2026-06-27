@@ -1,0 +1,57 @@
+<header class="app-header">
+  <div class="header-container">
+    <div class="header-flex">
+
+      <div class="brand-group">
+        <div class="brand-emoji">🎨</div>
+        <div class="brand-text">
+          <h1 class="brand-title">Artisan Market</h1>
+          <p class="brand-tagline">Handmade with love</p>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <a routerLink="/catalog" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+          Browse
+        </a>
+        <a *ngIf="(authService.currentUser$ | async)" routerLink="/my-orders" routerLinkActive="active-link" class="nav-item">
+          My Orders
+        </a>
+        <ng-container *ngIf="(authService.currentUser$ | async) as user">
+          <a *ngIf="user?.role === 'VENDOR'" routerLink="/vendor/dashboard" routerLinkActive="active-link" class="nav-item">
+            Dashboard
+          </a>
+          <a *ngIf="user?.role === 'ADMIN'" routerLink="/admin" routerLinkActive="active-link" class="nav-item">
+            Admin
+          </a>
+        </ng-container>
+      </nav>
+
+      <div class="auth-group">
+        <div *ngIf="authService.currentUser$ | async as user" class="user-session">
+          <a routerLink="/profile" class="profile-shortcut">
+            <div class="user-avatar">{{ getRoleEmoji(user.role) }}</div>
+            <div class="user-meta">
+              <p class="user-name">{{ user.firstName }}</p>
+              <p class="user-role">{{ user.role }}</p>
+            </div>
+          </a>
+
+          <button (click)="logout()" class="btn btn-logout">
+            Logout
+          </button>
+        </div>
+
+        <div *ngIf="!(authService.currentUser$ | async)" class="guest-actions">
+          <a routerLink="/login" class="btn btn-secondary">
+            Login
+          </a>
+          <a routerLink="/register" class="btn btn-primary">
+            Register
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>

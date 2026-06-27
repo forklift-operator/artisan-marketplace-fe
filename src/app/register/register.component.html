@@ -1,74 +1,68 @@
-<div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-  <div class="max-w-lg mx-auto">
-    <div class="card-artisan p-8 shadow-xl">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">✨</div>
-        <h1 class="text-3xl font-bold text-amber-900">Join Artisan Market</h1>
-        <p class="text-gray-600 text-sm mt-2">Create your account to buy or sell handmade crafts</p>
+<div class="auth-screen-wrapper">
+  <div class="auth-constrained-container max-w-lg">
+    <div class="login-card">
+      <div class="auth-header">
+        <div class="auth-icon">✨</div>
+        <h1 class="auth-title">Join Artisan Market</h1>
+        <p class="auth-subtitle">Create your account to buy or sell handmade crafts</p>
       </div>
 
-      <!-- Form -->
-      <form (ngSubmit)="onRegister()" class="space-y-4">
-        <!-- Name Fields -->
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-bold text-amber-900 mb-2">First Name</label>
+      <form (ngSubmit)="onRegister()" class="form-stack">
+        <div class="form-row">
+          <div class="field-stretch">
+            <label class="form-label">First Name</label>
             <input
               type="text"
               [(ngModel)]="form.firstName"
               name="firstName"
               placeholder="John"
               required
-              class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+              class="form-control"
             >
           </div>
-          <div>
-            <label class="block text-sm font-bold text-amber-900 mb-2">Last Name</label>
+          <div class="field-stretch">
+            <label class="form-label">Last Name</label>
             <input
               type="text"
               [(ngModel)]="form.lastName"
               name="lastName"
               placeholder="Doe"
               required
-              class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+              class="form-control"
             >
           </div>
         </div>
 
-        <!-- Email -->
-        <div>
-          <label class="block text-sm font-bold text-amber-900 mb-2">Email Address</label>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
           <input
             type="email"
             [(ngModel)]="form.email"
             name="email"
             placeholder="you@example.com"
             required
-            class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+            class="form-control"
           >
         </div>
 
-        <!-- Password -->
-        <div>
-          <label class="block text-sm font-bold text-amber-900 mb-2">Password</label>
+        <div class="form-group">
+          <label class="form-label">Password</label>
           <input
             type="password"
             [(ngModel)]="form.password"
             name="password"
             placeholder="••••••••"
             required
-            class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+            class="form-control"
           >
         </div>
 
-        <!-- Role -->
-        <div>
-          <label class="block text-sm font-bold text-amber-900 mb-2">I want to</label>
+        <div class="form-group">
+          <label class="form-label">I want to</label>
           <select
             [(ngModel)]="form.role"
             name="role"
-            class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+            class="form-control select-control"
           >
             <option value="USER">Shop for Handmade Products</option>
             <option value="VENDOR">Sell My Handmade Products</option>
@@ -76,54 +70,49 @@
           </select>
         </div>
 
-        <!-- Agreement -->
-        <div class="flex items-start gap-2 text-xs text-gray-600">
-          <input type="checkbox" required class="mt-1">
-          <span>I agree to the Terms of Service and Privacy Policy</span>
+        <div class="checkbox-group">
+          <input type="checkbox" id="termsAgreement" required class="form-checkbox">
+          <label for="termsAgreement">I agree to the Terms of Service and Privacy Policy</label>
         </div>
 
-        <!-- Submit -->
         <button
           type="submit"
           [disabled]="loading"
-          class="w-full btn-primary font-bold py-3 text-white transition-all mt-6"
+          class="btn btn-primary btn-submit mt-spacing"
         >
           {{ loading ? 'Creating Account...' : 'Create Account' }}
         </button>
       </form>
 
-      <!-- Error Message -->
-      <div *ngIf="error" class="mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-lg text-red-700 text-sm">
+      <div *ngIf="error" class="error-banner">
         {{ error }}
       </div>
 
-      <!-- Login Link -->
-      <div class="mt-6 text-center">
-        <p class="text-gray-600 text-sm">
+      <div class="auth-footer-link">
+        <p>
           Already have an account?
-          <a routerLink="/login" class="text-amber-700 font-bold hover:text-amber-900 transition">
+          <a routerLink="/login" class="text-link">
             Sign in
           </a>
         </p>
       </div>
     </div>
 
-    <!-- Features -->
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="p-4 bg-white rounded-lg shadow text-center">
-        <div class="text-3xl mb-2">🛍️</div>
-        <h3 class="font-bold text-amber-900 text-sm">Browse & Buy</h3>
-        <p class="text-gray-600 text-xs mt-1">Discover unique handmade items</p>
+    <div class="features-grid">
+      <div class="feature-item-card">
+        <div class="feature-icon">🛍️</div>
+        <h3 class="feature-title">Browse & Buy</h3>
+        <p class="feature-desc">Discover unique handmade items</p>
       </div>
-      <div class="p-4 bg-white rounded-lg shadow text-center">
-        <div class="text-3xl mb-2">💰</div>
-        <h3 class="font-bold text-amber-900 text-sm">Secure Payment</h3>
-        <p class="text-gray-600 text-xs mt-1">Safe & protected transactions</p>
+      <div class="feature-item-card">
+        <div class="feature-icon">💰</div>
+        <h3 class="feature-title">Secure Payment</h3>
+        <p class="feature-desc">Safe & protected transactions</p>
       </div>
-      <div class="p-4 bg-white rounded-lg shadow text-center">
-        <div class="text-3xl mb-2">⭐</div>
-        <h3 class="font-bold text-amber-900 text-sm">Leave Reviews</h3>
-        <p class="text-gray-600 text-xs mt-1">Share your feedback</p>
+      <div class="feature-item-card">
+        <div class="feature-icon">⭐</div>
+        <h3 class="feature-title">Leave Reviews</h3>
+        <p class="feature-desc">Share your honest feedback</p>
       </div>
     </div>
   </div>

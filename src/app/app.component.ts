@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './components/header.component';
-import { FooterComponent } from './components/footer.component';
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterOutlet} from '@angular/router';
+import {HeaderComponent} from './header/header.component';
 import {CartComponent} from './cart/cart.component';
 
 @Component({
@@ -13,11 +12,10 @@ import {CartComponent} from './cart/cart.component';
     <div class="min-h-screen flex flex-col bg-amber-50">
       <app-header></app-header>
       <app-cart></app-cart>
-      <main class="flex-1">
-        <router-outlet></router-outlet>
-      </main>
+      <router-outlet></router-outlet>
     </div>
   `
 })
-export class AppComponent {}
+export class AppComponent {
+}
 

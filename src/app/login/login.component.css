@@ -1,29 +1,198 @@
-/* login.component.css */
+/* ==========================================================================
+   Screen Layout Background Wrapper
+   ========================================================================== */
+.auth-screen-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fef3c7 0%, #ffedd5 100%); /* from-amber-50 to-orange-50 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
 
-/* Стил за кутията на формата */
-.card-artisan {
+.auth-constrained-container {
+  width: 100%;
+  max-width: 28rem; /* max-w-md */
+}
+
+/* ==========================================================================
+   The Main Login Card Component
+   ========================================================================== */
+.login-card {
   background-color: #ffffff;
-  border-radius: 1rem; /* 16px (rounded-2xl) */
-  border: 1px solid #fef3c7; /* Тънък амбър кант (border-amber-100) */
+  border-radius: 1rem;
+  border: 1px solid rgba(254, 243, 199, 0.7);
+  padding: 2rem;
+  box-shadow:
+    0 10px 25px -5px rgba(120, 53, 15, 0.08),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* Стил за главния бутон */
-.btn-primary {
-  background-color: #b45309; /* Кехлибарен цвят (bg-amber-700) */
-  border-radius: 0.5rem; /* 8px (rounded-lg) */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Сянка */
+/* Header Text Alignments */
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.auth-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #78350f; /* text-amber-900 */
+  margin: 0;
+}
+
+.auth-subtitle {
+  color: #4b5563;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Form Stacking Layout & Control Rings
+   ========================================================================== */
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #78350f;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: 2px solid #fde68a; /* border-amber-200 */
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-control:focus {
+  border-color: #b45309; /* focus:border-amber-700 */
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15);
+}
+
+/* ==========================================================================
+   Interactive Button Micro-interactions
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border-radius: 0.5rem;
   cursor: pointer;
+  box-sizing: border-box;
+  border: none;
+  transition: all 0.2s ease-in-out;
 }
 
-/* Ефект при посочване на бутона с мишката */
+.btn-submit {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: #b45309; /* bg-amber-700 */
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(180, 83, 9, 0.1);
+}
+
 .btn-primary:hover:not(:disabled) {
-  background-color: #92400e; /* По-тъмен нюанс (hover:bg-amber-800) */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* По-голяма сянка */
+  background-color: #92400e; /* hover:bg-amber-800 */
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(146, 64, 14, 0.2);
 }
 
-/* Стил за бутона, когато формата се зарежда/изпраща */
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
 .btn-primary:disabled {
-  background-color: #fbbf24; /* Светъл цвят (disabled:bg-amber-400) */
-  cursor: not-allowed; /* Забранен курсор */
+  background-color: #fcd34d; /* disabled states matching app profile rules */
+  color: #ffffff;
+  cursor: not-allowed;
   opacity: 0.7;
+}
+
+/* ==========================================================================
+   Feedback Messages & Extra Items
+   ========================================================================== */
+.error-banner {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #fef2f2; /* bg-red-50 */
+  border: 2px solid #fecaca; /* border-red-200 */
+  border-radius: 0.5rem;
+  color: #b91c1c; /* text-red-700 */
+  font-size: 0.875rem;
+}
+
+.auth-footer-link {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.auth-footer-link p {
+  margin: 0;
+}
+
+.text-link {
+  color: #b45309;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.text-link:hover {
+  color: #78350f;
+  text-decoration: underline;
+}
+
+/* Balanced Standalone Testimonial Layout */
+.auth-testimonial {
+  margin: 2rem 0 0 0;
+  padding: 1.25rem 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border-left: 4px solid #b45309;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.testimonial-quote {
+  color: #374151;
+  font-style: italic;
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.testimonial-author {
+  color: #78350f;
+  font-weight: 600;
+  font-size: 0.75rem;
+  font-style: normal;
 }

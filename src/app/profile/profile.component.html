@@ -23,11 +23,6 @@
           <h2 class="user-name">
             {{ user()!.firstName }} {{ user()!.lastName }}
           </h2>
-          <p class="user-email">{{ user()!.email }}</p>
-          <span class="badge-handmade badge-spacing">
-            {{ user()!.role }}
-          </span>
-          <p class="member-id">Member ID: #{{ user()!.id }}</p>
         </div>
 
         <div class="artisan-card p-large">
@@ -35,7 +30,7 @@
           <div class="stats-list">
             <div class="stat-item">
               <span class="stat-label">Total Orders:</span>
-              <span class="stat-value">{{ stats.totalOrders }}</span>
+<!--              <span class="stat-value">{{ stats.totalOrders }}</span>-->
             </div>
             <div class="stat-item">
               <span class="stat-label">Reviews Given:</span>
@@ -53,9 +48,9 @@
         </div>
 
         <div class="artisan-card p-large actions-list">
-          <a routerLink="/profile" class="btn btn-secondary btn-block">
+          <button (click)="openModal()" class="btn btn-secondary btn-block">
             ✏️ Edit Profile
-          </a>
+          </button>
           <a *ngIf="user()!.role === 'VENDOR'" routerLink="/vendor-dashboard" class="btn btn-primary btn-block">
             🎨 Vendor Dashboard
           </a>
@@ -66,50 +61,6 @@
       </aside>
 
       <main class="profile-main">
-        <div class="artisan-card p-large">
-          <h3 class="panel-title">✏️ Edit Profile</h3>
-          <form (ngSubmit)="updateProfile()" class="form-stack">
-            <div class="form-row">
-              <div class="field-stretch">
-                <label class="form-label">First Name</label>
-                <input
-                  type="text"
-                  [(ngModel)]="editForm.firstName"
-                  name="firstName"
-                  class="form-control"
-                >
-              </div>
-              <div class="field-stretch">
-                <label class="form-label">Last Name</label>
-                <input
-                  type="text"
-                  [(ngModel)]="editForm.lastName"
-                  name="lastName"
-                  class="form-control"
-                >
-              </div>
-            </div>
-
-            <div>
-              <label class="form-label">Email Address</label>
-              <input
-                type="email"
-                [(ngModel)]="editForm.email"
-                name="email"
-                class="form-control"
-              >
-            </div>
-
-            <button
-              type="submit"
-              [disabled]="updating()"
-              class="btn btn-primary btn-submit"
-            >
-              {{ updating() ? 'Saving...' : 'Save Changes' }}
-            </button>
-          </form>
-        </div>
-
         <div class="artisan-card p-large">
           <h3 class="panel-title">📦 Past Orders</h3>
 
@@ -126,16 +77,10 @@
               <div class="order-header">
                 <div>
                   <p class="order-id">Order #{{ order.id }}</p>
-                  <p class="order-date">{{ order.createdAt | date:'short' }}</p>
                 </div>
-                <span class="badge-status"
-                      [class.status-pending]="order.status === 'PENDING'"
-                      [class.status-processing]="order.status === 'PROCESSING'"
-                      [class.status-shipped]="order.status === 'SHIPPED'"
-                      [class.status-completed]="order.status === 'COMPLETED'"
-                      [class.status-cancelled]="order.status === 'CANCELLED'">
-                      {{ order.status }}
-                </span>
+<!--                <span class="badge-status" [ngClass]="getOrderStatusColor(order.status)">-->
+<!--                  {{ order.status }}-->
+<!--                </span>-->
               </div>
 
               <div class="order-summary-grid">
@@ -145,7 +90,7 @@
                 </div>
                 <div>
                   <p class="summary-label">Total</p>
-                  <p class="summary-value">\${{ order.totalPrice | number:'1.2-2' }}</p>
+<!--                  <p class="summary-value">${{ order.totalPrice | number:'1.2-2' }}</p>-->
                 </div>
                 <div class="text-right">
                   <button (click)="expandOrder.set(expandOrder() === (order.id || 0) ? null : (order.id || 0))" class="toggle-details-btn">
@@ -159,7 +104,7 @@
                 <div class="details-list">
                   <div *ngFor="let item of order.items" class="details-row">
                     <span>Product #{{ item.productId }} × {{ item.quantity }}</span>
-                    <span class="item-price">\${{ (item.price || 0) | number:'1.2-2' }}</span>
+                    <span class="item-price">${{ (item.price || 0) | number:'1.2-2' }}</span>
                   </div>
                 </div>
               </div>
@@ -169,4 +114,65 @@
       </main>
     </div>
   </div>
+
+  @if (isModalOpen()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="artisan-card p-large modal-window" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="panel-title">✏️ Edit Profile</h3>
+          <button type="button" class="close-modal-btn" (click)="closeModal()">&times;</button>
+        </div>
+
+        <form (ngSubmit)="updateProfile()" class="form-stack">
+          <div class="form-row">
+            <div class="field-stretch">
+              <label class="form-label">First Name</label>
+              <input
+                type="text"
+                [(ngModel)]="editForm.firstName"
+                name="firstName"
+                class="form-control"
+              >
+            </div>
+            <div class="field-stretch">
+              <label class="form-label">Last Name</label>
+              <input
+                type="text"
+                [(ngModel)]="editForm.lastName"
+                name="lastName"
+                class="form-control"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">Email Address</label>
+            <input
+              type="email"
+              [(ngModel)]="editForm.email"
+              name="email"
+              class="form-control"
+            >
+          </div>
+
+          <div class="modal-actions-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              [disabled]="updating()"
+              class="btn btn-primary btn-submit-tweak"
+            >
+              {{ updating() ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 </div>

@@ -3,6 +3,21 @@
   height: 100%;
 }
 
+/* Strip default margins that cause the gap collapse */
+.hero-title,
+h1,
+h2,
+h3,
+p {
+  margin-top: 0; /* This stops the elements from pushing down from the top */
+}
+
+/* Ensure the layout wrapper itself handles vertical spacing cleanly via padding */
+.main-content {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 html, body {
   height: 100%;
   margin: 0;

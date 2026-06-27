@@ -1,39 +1,50 @@
-<div class="cart">
-  <div class="cart-header">
-    <h1>Your cart</h1>
-    <button type="button" class="cart-close" (click)="closeCart()">✕</button>
-  </div>
+<ng-container *ngIf="(authService.currentUser$ | async)">
 
-  <div *ngIf="cartItems().length === 0" class="cart-empty">
-    <p>Your cart is empty.</p>
-  </div>
+  <button *ngIf="!isOpen()" type="button" class="cart-floating-badge" (click)="openCart()">
+    <span class="badge-icon">🛒</span>
+    <span *ngIf="getCartCount() > 0" class="badge-counter">{{ getCartCount() }}</span>
+  </button>
 
-  <div class="cart-items" *ngIf="cartItems().length > 0">
-    <div class="product-item" *ngFor="let item of cartItems(); let i = index; trackBy: trackById">
-      <div class="product-info">
-        <h3 class="product-title">{{ item.title }}</h3>
-        <div class="product-price">{{ item.price | currency }}</div>
+  <div *ngIf="isOpen()" class="cart-panel-overlay" (click)="closeCart()">
+    <div class="cart" (click)="$event.stopPropagation()">
+      <div class="cart-header">
+        <h1>Your cart</h1>
+        <button type="button" class="cart-close" (click)="closeCart()">✕</button>
       </div>
 
-      <div class="product-quantity">
-        <button type="button" (click)="decreaseQuantity(i)">-</button>
-        <input type="number" [value]="item.quantity" min="1" (change)="updateQuantity(i, $any($event.target).value)" class="quantity-input" />
-        <button type="button" (click)="increaseQuantity(i)">+</button>
+      <div *ngIf="cartItems().length === 0" class="cart-empty">
+        <p>Your cart is empty.</p>
       </div>
 
-      <div class="product-subtotal">{{ (item.price * item.quantity) | currency }}</div>
+      <div class="cart-items" *ngIf="cartItems().length > 0">
+        <div class="product-item" *ngFor="let item of cartItems(); let i = index; trackBy: trackById">
+          <div class="product-info">
+            <h3 class="product-title">{{ item.title }}</h3>
+            <div class="product-price">{{ item.price | currency }}</div>
+          </div>
 
-      <div class="product-actions">
-        <button type="button" (click)="removeItem(i)">Remove</button>
+          <div class="product-quantity">
+            <button type="button" (click)="decreaseQuantity(i)">-</button>
+            <input type="number" [value]="item.quantity" min="1" (change)="updateQuantity(i, $any($event.target).value)" class="quantity-input" />
+            <button type="button" (click)="increaseQuantity(i)">+</button>
+          </div>
+
+          <div class="product-subtotal">{{ (item.price * item.quantity) | currency }}</div>
+
+          <div class="product-actions">
+            <button type="button" (click)="removeItem(i)">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-summary" *ngIf="cartItems().length > 0">
+        <div class="total">Total: {{ getTotal() | currency }}</div>
+        <div class="summary-actions">
+          <button type="button" (click)="clearCart()">Clear cart</button>
+          <button type="button" (click)="checkout()">Checkout</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="cart-summary" *ngIf="cartItems().length > 0">
-    <div class="total">Total: {{ getTotal() | currency }}</div>
-    <div class="summary-actions">
-      <button type="button" (click)="clearCart()">Clear cart</button>
-      <button type="button" (click)="checkout()">Checkout</button>
-    </div>
-  </div>
-</div>
+</ng-container>
