@@ -1,10 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ProductService, Product } from '../services/product.service';
-import { ReviewService, Review } from '../services/review.service';
-import { AuthService } from '../services/auth.service';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ProductService, Product} from '../services/product.service';
+import {ReviewService, Review} from '../services/review.service';
+import {AuthService} from '../services/auth.service';
+import {OrderService} from '../services/order.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -13,10 +14,11 @@ import { AuthService } from '../services/auth.service';
   styleUrl: './product-detail.component.css'
 })
 export class ProductDetailComponent {
-private productService = inject(ProductService);
+  private productService = inject(ProductService);
   private reviewService = inject(ReviewService);
   private route = inject(ActivatedRoute);
   authService = inject(AuthService);
+  private orderService = inject(OrderService);
 
   product = signal<Product | null>(null);
   reviews = signal<Review[]>([]);
@@ -76,7 +78,7 @@ private productService = inject(ProductService);
     this.reviewService.createReview(review, this.product()!.id!).subscribe({
       next: (newReview) => {
         this.reviews.set([...this.reviews(), newReview]);
-        this.newReview = { rating: 5, text: '' };
+        this.newReview = {rating: 5, text: ''};
       },
       error: (err) => console.error('Error submitting review:', err)
     });
@@ -93,6 +95,10 @@ private productService = inject(ProductService);
   }
 
   addToCart() {
-    alert(`Added "${this.product()!.name}" to cart! 🛒`);
+    if (!this.product()) return;
+
+    const product = this.product()!;
+    this.orderService.addItem(product.id!, product.name, product.price || 0, 1);
+    alert(`Added "${product.name}" to cart! 🛒`);
   }
 }

@@ -1,190 +1,172 @@
-<div class="min-h-screen bg-amber-50">
-  <!-- Header -->
-  <section class="bg-gradient-to-r from-amber-700 via-orange-700 to-red-700 text-white py-12">
-    <div class="max-w-7xl mx-auto px-4">
-      <h1 class="text-4xl font-bold mb-2">👤 My Profile</h1>
-      <p class="text-amber-100">Manage your artisan marketplace account</p>
+<div class="profile-layout">
+  <header class="profile-hero">
+    <div class="layout-container">
+      <h1 class="hero-title">👤 My Profile</h1>
+      <p class="hero-subtitle">Manage your artisan marketplace account</p>
     </div>
-  </section>
+  </header>
 
-  <!-- Content -->
-  <div class="max-w-6xl mx-auto px-4 py-8">
-    <a routerLink="/catalog" class="text-amber-700 hover:text-amber-900 font-bold mb-6 inline-block">
+  <div class="layout-container main-content">
+    <a routerLink="/catalog" class="back-link">
       ← Back to Catalog
     </a>
 
-    <!-- Loading State -->
-    <div *ngIf="loading()" class="text-center py-12">
-      <div class="text-5xl mb-4">⏳</div>
-      <p class="text-gray-600">Loading profile...</p>
+    <div *ngIf="loading()" class="state-message">
+      <div class="state-icon">⏳</div>
+      <p class="state-text">Loading profile...</p>
     </div>
 
-    <!-- Profile Content -->
-    <div *ngIf="!loading() && user()" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Sidebar -->
-      <div class="md:col-span-1">
-        <div class="card-artisan p-6 text-center">
-          <div class="text-7xl mb-4">{{ getRoleEmoji(user()!.role) }}</div>
-          <h2 class="text-2xl font-bold text-amber-900 mb-2">
+    <div *ngIf="!loading() && user()" class="profile-grid">
+      <aside class="profile-sidebar">
+        <div class="artisan-card text-center p-large">
+          <div class="role-avatar">{{ getRoleEmoji(user()!.role) }}</div>
+          <h2 class="user-name">
             {{ user()!.firstName }} {{ user()!.lastName }}
           </h2>
-          <p class="text-gray-600 text-sm mb-4">{{ user()!.email }}</p>
-          <span class="badge-handmade mb-4 inline-block">
-                {{ user()!.role }}
-              </span>
-          <p class="text-xs text-gray-500">Member ID: #{{ user()!.id }}</p>
+          <p class="user-email">{{ user()!.email }}</p>
+          <span class="badge-handmade badge-spacing">
+            {{ user()!.role }}
+          </span>
+          <p class="member-id">Member ID: #{{ user()!.id }}</p>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="card-artisan p-6 mt-6">
-          <h3 class="font-bold text-amber-900 mb-4">📊 Quick Stats</h3>
-          <div class="space-y-3">
-            <div class="flex justify-between">
-              <span class="text-gray-600">Total Orders:</span>
-              <span class="font-bold text-amber-900">{{ stats.totalOrders }}</span>
+        <div class="artisan-card p-large">
+          <h3 class="card-heading">📊 Quick Stats</h3>
+          <div class="stats-list">
+            <div class="stat-item">
+              <span class="stat-label">Total Orders:</span>
+              <span class="stat-value">{{ stats.totalOrders }}</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Reviews Given:</span>
-              <span class="font-bold text-amber-900">{{ stats.reviewsGiven }}</span>
+            <div class="stat-item">
+              <span class="stat-label">Reviews Given:</span>
+              <span class="stat-value">{{ stats.reviewsGiven }}</span>
             </div>
-            <div *ngIf="user()!.role === 'VENDOR'" class="flex justify-between">
-              <span class="text-gray-600">Products Listed:</span>
-              <span class="font-bold text-amber-900">{{ stats.productsListed }}</span>
+            <div *ngIf="user()!.role === 'VENDOR'" class="stat-item">
+              <span class="stat-label">Products Listed:</span>
+              <span class="stat-value">{{ stats.productsListed }}</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Member Since:</span>
-              <span class="font-bold text-amber-900">2024</span>
+            <div class="stat-item">
+              <span class="stat-label">Member Since:</span>
+              <span class="stat-value">2024</span>
             </div>
           </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="card-artisan p-6 mt-6 space-y-2">
-          <a routerLink="/profile" class="block w-full btn-secondary font-bold py-2 px-4 text-center text-sm">
+        <div class="artisan-card p-large actions-list">
+          <a routerLink="/profile" class="btn btn-secondary btn-block">
             ✏️ Edit Profile
           </a>
-          <a *ngIf="user()!.role === 'VENDOR'" routerLink="/vendor-dashboard" class="block w-full btn-primary font-bold py-2 px-4 text-center text-sm text-white">
+          <a *ngIf="user()!.role === 'VENDOR'" routerLink="/vendor-dashboard" class="btn btn-primary btn-block">
             🎨 Vendor Dashboard
           </a>
-          <a *ngIf="user()!.role === 'ADMIN'" routerLink="/admin" class="block w-full btn-primary font-bold py-2 px-4 text-center text-sm text-white">
+          <a *ngIf="user()!.role === 'ADMIN'" routerLink="/admin" class="btn btn-primary btn-block">
             👑 Admin Panel
           </a>
         </div>
-      </div>
+      </aside>
 
-      <!-- Main Content -->
-      <div class="md:col-span-2">
-        <!-- Edit Profile -->
-        <div class="card-artisan p-6 mb-6">
-          <h3 class="text-xl font-bold text-amber-900 mb-4">✏️ Edit Profile</h3>
-          <form (ngSubmit)="updateProfile()" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-bold text-amber-900 mb-2">First Name</label>
+      <main class="profile-main">
+        <div class="artisan-card p-large">
+          <h3 class="panel-title">✏️ Edit Profile</h3>
+          <form (ngSubmit)="updateProfile()" class="form-stack">
+            <div class="form-row">
+              <div class="field-stretch">
+                <label class="form-label">First Name</label>
                 <input
                   type="text"
                   [(ngModel)]="editForm.firstName"
                   name="firstName"
-                  class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600"
+                  class="form-control"
                 >
               </div>
-              <div>
-                <label class="block text-sm font-bold text-amber-900 mb-2">Last Name</label>
+              <div class="field-stretch">
+                <label class="form-label">Last Name</label>
                 <input
                   type="text"
                   [(ngModel)]="editForm.lastName"
                   name="lastName"
-                  class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600"
+                  class="form-control"
                 >
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-bold text-amber-900 mb-2">Email Address</label>
+              <label class="form-label">Email Address</label>
               <input
                 type="email"
                 [(ngModel)]="editForm.email"
                 name="email"
-                class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600"
+                class="form-control"
               >
             </div>
 
             <button
               type="submit"
               [disabled]="updating()"
-              class="btn-primary font-bold text-white py-2 px-6"
+              class="btn btn-primary btn-submit"
             >
               {{ updating() ? 'Saving...' : 'Save Changes' }}
             </button>
           </form>
         </div>
 
-        <!-- Past Orders -->
-        <div class="card-artisan p-6">
-          <h3 class="text-xl font-bold text-amber-900 mb-4">📦 Past Orders</h3>
+        <div class="artisan-card p-large">
+          <h3 class="panel-title">📦 Past Orders</h3>
 
-          <!-- Empty State -->
-          <div *ngIf="orders().length === 0" class="text-center py-8">
-            <div class="text-4xl mb-3">🛒</div>
-            <p class="text-gray-600">No orders yet. Start shopping!</p>
-            <a routerLink="/catalog" class="btn-primary font-bold text-white py-2 px-6 inline-block mt-4">
+          <div *ngIf="orders().length === 0" class="empty-orders-state">
+            <div class="empty-icon">🛒</div>
+            <p class="state-text">No orders yet. Start shopping!</p>
+            <a routerLink="/catalog" class="btn btn-primary btn-inline">
               Browse Products
             </a>
           </div>
 
-          <!-- Orders List -->
-          <div *ngIf="orders().length > 0" class="space-y-4">
-            <div *ngFor="let order of orders()" class="border-2 border-amber-200 rounded-lg p-4 hover:bg-amber-50 transition">
-              <div class="flex items-center justify-between mb-3">
+          <div *ngIf="orders().length > 0" class="orders-stack">
+            <div *ngFor="let order of orders()" class="order-item">
+              <div class="order-header">
                 <div>
-                  <p class="font-bold text-amber-900">Order #{{ order.id }}</p>
-                  <p class="text-sm text-gray-600">{{ order.createdAt | date:'short' }}</p>
+                  <p class="order-id">Order #{{ order.id }}</p>
+                  <p class="order-date">{{ order.createdAt | date:'short' }}</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm font-bold"
-                      [class.bg-yellow-100]="order.status === 'PENDING'"
-                      [class.text-yellow-800]="order.status === 'PENDING'"
-                      [class.bg-blue-100]="order.status === 'PROCESSING'"
-                      [class.text-blue-800]="order.status === 'PROCESSING'"
-                      [class.bg-purple-100]="order.status === 'SHIPPED'"
-                      [class.text-purple-800]="order.status === 'SHIPPED'"
-                      [class.bg-green-100]="order.status === 'COMPLETED'"
-                      [class.text-green-800]="order.status === 'COMPLETED'"
-                      [class.bg-red-100]="order.status === 'CANCELLED'"
-                      [class.text-red-800]="order.status === 'CANCELLED'">
+                <span class="badge-status"
+                      [class.status-pending]="order.status === 'PENDING'"
+                      [class.status-processing]="order.status === 'PROCESSING'"
+                      [class.status-shipped]="order.status === 'SHIPPED'"
+                      [class.status-completed]="order.status === 'COMPLETED'"
+                      [class.status-cancelled]="order.status === 'CANCELLED'">
                       {{ order.status }}
-                    </span>
+                </span>
               </div>
 
-              <div class="grid grid-cols-3 gap-4 text-sm mb-3">
+              <div class="order-summary-grid">
                 <div>
-                  <p class="text-gray-600">Items</p>
-                  <p class="font-bold text-amber-900">{{ order.items && order.items.length || 0 }}</p>
+                  <p class="summary-label">Items</p>
+                  <p class="summary-value">{{ order.items && order.items.length || 0 }}</p>
                 </div>
                 <div>
-                  <p class="text-gray-600">Total</p>
-                  <p class="font-bold text-amber-900">\${{ order.totalPrice | number:'1.2-2' }}</p>
+                  <p class="summary-label">Total</p>
+                  <p class="summary-value">\${{ order.totalPrice | number:'1.2-2' }}</p>
                 </div>
                 <div class="text-right">
-                  <button (click)="expandOrder.set(expandOrder() === (order.id || 0) ? null : (order.id || 0))" class="text-amber-700 hover:text-amber-900 font-bold">
+                  <button (click)="expandOrder.set(expandOrder() === (order.id || 0) ? null : (order.id || 0))" class="toggle-details-btn">
                     {{ expandOrder() === (order.id || 0) ? '▼' : '▶' }} Details
                   </button>
                 </div>
               </div>
 
-              <!-- Expanded Details -->
-              <div *ngIf="expandOrder() === order.id" class="pt-3 border-t border-amber-200 bg-amber-50 p-3 rounded">
-                <h4 class="font-bold text-amber-900 mb-2">Items:</h4>
-                <div class="space-y-2">
-                  <div *ngFor="let item of order.items" class="flex justify-between text-sm">
+              <div *ngIf="expandOrder() === order.id" class="order-details-pane">
+                <h4 class="details-heading">Items:</h4>
+                <div class="details-list">
+                  <div *ngFor="let item of order.items" class="details-row">
                     <span>Product #{{ item.productId }} × {{ item.quantity }}</span>
-                    <span class="font-bold">\${{ (item.price || 0) | number:'1.2-2' }}</span>
+                    <span class="item-price">\${{ (item.price || 0) | number:'1.2-2' }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   </div>
 </div>

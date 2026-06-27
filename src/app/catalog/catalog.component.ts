@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ProductService, Product } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
+import { OrderService } from '../services/order.service';
 
 @Component({
   selector: 'app-catalog',
@@ -14,6 +15,7 @@ import { AuthService } from '../services/auth.service';
 export class CatalogComponent {
   private productService = inject(ProductService);
   authService = inject(AuthService);
+  private orderService = inject(OrderService);
 
   products = signal<Product[]>([]);
   filteredProducts = signal<Product[]>([]);
@@ -53,7 +55,7 @@ export class CatalogComponent {
   }
 
   addToCart(product: Product) {
-    alert(`Added "${product.name}" to cart! 🛒`);
-    // Cart functionality would be implemented here
+    // delegate to OrderService so UI updates reactively
+    this.orderService.addItem(product.id!, product.name, product.price || 0, 1);
   }
 }
