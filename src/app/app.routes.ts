@@ -1,24 +1,24 @@
 import { Routes } from '@angular/router';
-import { LoginPage } from './pages/login.page';
-import { RegisterPage } from './pages/register.page';
-import { CatalogPage } from './pages/catalog.page';
-import { ProductDetailPage } from './pages/product-detail.page';
-import { AddProductPage } from './pages/add-product.page';
-import { OrdersPage } from './pages/orders.page';
-import { ProfilePage } from './pages/profile.page';
-import { VendorDashboardPage } from './pages/vendor-dashboard.page';
-import { EditProductPage } from './pages/edit-product.page';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
+import { CatalogComponent } from './catalog/catalog.component';
+import { ProductDetailComponent } from './product-detail/product-detail.component';
+import { AddProductComponent } from './add-product/add-product.component';
+import { OrdersComponent } from './orders/orders.component';
+import { ProfileComponent } from './profile/profile.component';
+import { VendorDashboardComponent } from './vendor-dashboard/vendor-dashboard.component';
+import { EditProductComponent } from './edit-product/edit-product.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/catalog', pathMatch: 'full' },
-  { path: 'login', component: LoginPage },
-  { path: 'register', component: RegisterPage },
-  { path: 'catalog', component: CatalogPage },
-  { path: 'product/:id', component: ProductDetailPage },
-  { path: 'add-product', component: AddProductPage },
-  { path: 'my-orders', component: OrdersPage },
-  { path: 'profile', component: ProfilePage },
-  { path: 'vendor/dashboard', component: VendorDashboardPage },
-  { path: 'vendor/product/:id/edit', component: EditProductPage },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'catalog', component: CatalogComponent },
+  { path: 'product/:id', component: ProductDetailComponent },
+  { path: 'add-product', component: AddProductComponent },
+  { path: 'my-orders', component: OrdersComponent },
+  { path: 'profile', component: ProfileComponent },
+  { path: 'vendor-dashboard', component: VendorDashboardComponent },
+  { path: 'vendor/product/:id/edit', component: EditProductComponent },
   { path: '**', redirectTo: '/catalog' }
 ];
