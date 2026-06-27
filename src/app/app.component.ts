@@ -12,7 +12,9 @@ import {CartComponent} from './cart/cart.component';
     <div class="min-h-screen flex flex-col bg-amber-50">
       <app-header></app-header>
       <app-cart></app-cart>
-      <router-outlet></router-outlet>
+      <main class="flex-1">
+        <router-outlet></router-outlet>
+      </main>
     </div>
   `
 })

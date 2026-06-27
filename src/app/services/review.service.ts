@@ -6,7 +6,7 @@ export interface Review {
   id?: number;
   productId: number;
   userId: number;
-  rating: number;
+  stars: number;
   text: string;
   createdAt?: string;
   updatedAt?: string;

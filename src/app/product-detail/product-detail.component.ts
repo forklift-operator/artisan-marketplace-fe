@@ -1,11 +1,11 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {ActivatedRoute, RouterLink} from '@angular/router';
-import {ProductService, Product} from '../services/product.service';
-import {ReviewService, Review} from '../services/review.service';
-import {AuthService} from '../services/auth.service';
-import {OrderService} from '../services/order.service';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ProductService, Product } from '../services/product.service';
+import { ReviewService, Review } from '../services/review.service';
+import { AuthService } from '../services/auth.service';
+import { OrderService } from '../services/order.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -25,7 +25,7 @@ export class ProductDetailComponent {
   loading = signal(false);
 
   newReview = {
-    rating: 5,
+    stars: 5,
     text: ''
   };
 
@@ -71,14 +71,14 @@ export class ProductDetailComponent {
     const review: Review = {
       productId: this.product()!.id!,
       userId: this.authService.getLoggedInUserId(),
-      rating: this.newReview.rating,
+      stars: this.newReview.stars,
       text: this.newReview.text
     };
 
     this.reviewService.createReview(review, this.product()!.id!).subscribe({
       next: (newReview) => {
         this.reviews.set([...this.reviews(), newReview]);
-        this.newReview = {rating: 5, text: ''};
+        this.newReview = { stars: 5, text: '' };
       },
       error: (err) => console.error('Error submitting review:', err)
     });
@@ -86,12 +86,12 @@ export class ProductDetailComponent {
 
   averageRating() {
     if (this.reviews().length === 0) return 0;
-    const sum = this.reviews().reduce((acc, r) => acc + r.rating, 0);
+    const sum = this.reviews().reduce((acc, r) => acc + r.stars, 0);
     return (sum / this.reviews().length).toFixed(1);
   }
 
-  getStars(rating: number): string {
-    return '⭐'.repeat(rating);
+  getStars(stars: number): string {
+    return '⭐'.repeat(stars);
   }
 
   addToCart() {
