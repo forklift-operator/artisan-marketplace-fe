@@ -1,0 +1,226 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ProductService, Product } from '../services/product.service';
+import { ReviewService, Review } from '../services/review.service';
+import { AuthService } from '../services/auth.service';
+
+@Component({
+  selector: 'app-product-detail',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  template: `
+    <div class="min-h-screen bg-amber-50">
+      <div class="max-w-6xl mx-auto px-4 py-8">
+        <a routerLink="/catalog" class="text-amber-700 hover:text-amber-900 font-bold mb-6 inline-block">
+          ← Back to Catalog
+        </a>
+
+        <div *ngIf="loading()" class="text-center py-12">
+          <div class="text-5xl mb-4">⏳</div>
+          <p class="text-gray-600">Loading product details...</p>
+        </div>
+
+        <div *ngIf="!loading() && product()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Product Image -->
+          <div class="card-artisan h-96 flex items-center justify-center text-8xl rounded-xl">
+            🎨
+          </div>
+
+          <!-- Product Info -->
+          <div>
+            <div class="mb-4">
+              <span class="badge-handmade mb-2 inline-block">Handmade</span>
+              <h1 class="text-4xl font-bold text-amber-900 mb-2">{{ product()!.name }}</h1>
+              <p class="text-gray-600 text-sm">🏷️ SKU: #{{ product()!.id }}</p>
+            </div>
+
+            <p class="text-gray-700 leading-relaxed mb-6">{{ product()!.description }}</p>
+
+            <!-- Details -->
+            <div class="space-y-3 mb-8 pb-8 border-b-2 border-amber-200">
+              <div class="flex justify-between">
+                <span class="text-gray-600">📍 Location:</span>
+                <span class="font-bold text-amber-900">{{ product()!.location }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">📦 Stock:</span>
+                <span class="font-bold" [ngClass]="product()!.quantity > 0 ? 'text-green-600' : 'text-red-600'">
+                  {{ product()!.quantity > 0 ? product()!.quantity + ' available' : 'Out of stock' }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">⏰ Added:</span>
+                <span class="font-bold text-amber-900">{{ product()!.createdAt | date:'short' }}</span>
+              </div>
+            </div>
+
+            <!-- Price & Actions -->
+            <div class="mb-8">
+              <p class="text-5xl font-bold text-amber-900 mb-6">\${{ product()!.price | number:'1.2-2' }}</p>
+              <div class="flex gap-3">
+                <button 
+                  (click)="addToCart()"
+                  [disabled]="product()!.quantity === 0"
+                  class="flex-1 btn-primary font-bold py-3 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  🛒 Add to Cart
+                </button>
+                <button class="btn-secondary font-bold py-3 px-6">
+                  ❤️ Wishlist
+                </button>
+              </div>
+            </div>
+
+            <!-- Rating Info -->
+            <div class="bg-white p-4 rounded-lg border-2 border-amber-200">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-amber-900">Customer Reviews</span>
+                <span class="text-2xl">⭐ {{ averageRating() || 'N/A' }}</span>
+              </div>
+              <p class="text-sm text-gray-600">{{ reviews().length }} reviews from satisfied customers</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div *ngIf="!loading() && product()" class="mt-12 max-w-4xl">
+          <h2 class="text-3xl font-bold text-amber-900 mb-8">📝 Customer Reviews</h2>
+
+          <!-- Add Review Form -->
+          <div *ngIf="(authService.currentUser$ | async)" class="card-artisan p-6 mb-8">
+            <h3 class="text-xl font-bold text-amber-900 mb-4">Share Your Experience</h3>
+            <form (ngSubmit)="submitReview()" class="space-y-4">
+              <div>
+                <label class="block text-sm font-bold text-amber-900 mb-2">Rating</label>
+                <select [(ngModel)]="newReview.rating" name="rating" class="w-full px-4 py-2 border-2 border-amber-300 rounded-lg">
+                  <option [ngValue]="5">⭐⭐⭐⭐⭐ Excellent</option>
+                  <option [ngValue]="4">⭐⭐⭐⭐ Good</option>
+                  <option [ngValue]="3">⭐⭐⭐ Average</option>
+                  <option [ngValue]="2">⭐⭐ Poor</option>
+                  <option [ngValue]="1">⭐ Terrible</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-amber-900 mb-2">Your Review</label>
+                <textarea 
+                  [(ngModel)]="newReview.comment" 
+                  name="comment"
+                  placeholder="Tell us about this product..."
+                  rows="4"
+                  class="w-full px-4 py-2 border-2 border-amber-300 rounded-lg focus:outline-none focus:border-amber-600"
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary font-bold text-white py-2 px-6">
+                Post Review
+              </button>
+            </form>
+          </div>
+
+          <!-- Reviews List -->
+          <div class="space-y-4">
+            <div *ngFor="let review of reviews()" class="card-artisan p-6">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <p class="font-bold text-amber-900">Customer Review</p>
+                  <p class="text-sm text-gray-600">{{ review.createdAt | date:'short' }}</p>
+                </div>
+                <span class="text-2xl">{{ getStars(review.rating) }}</span>
+              </div>
+              <p class="text-gray-700">{{ review.comment }}</p>
+            </div>
+
+            <div *ngIf="reviews().length === 0" class="text-center py-8">
+              <p class="text-gray-600">No reviews yet. Be the first to review this product! 🌟</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class ProductDetailPage implements OnInit {
+  private productService = inject(ProductService);
+  private reviewService = inject(ReviewService);
+  private route = inject(ActivatedRoute);
+  authService = inject(AuthService);
+
+  product = signal<Product | null>(null);
+  reviews = signal<Review[]>([]);
+  loading = signal(false);
+
+  newReview = {
+    rating: 5,
+    comment: ''
+  };
+
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      const id = +params['id'];
+      this.loadProduct(id);
+      this.loadReviews(id);
+    });
+  }
+
+  loadProduct(id: number) {
+    this.loading.set(true);
+    this.productService.getProductById(id).subscribe({
+      next: (data) => {
+        this.product.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading product:', err);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  loadReviews(productId: number) {
+    this.reviewService.getProductReviews(productId).subscribe({
+      next: (data) => {
+        this.reviews.set(data);
+      },
+      error: (err) => {
+        console.error('Error loading reviews:', err);
+      }
+    });
+  }
+
+  submitReview() {
+    if (!this.product() || !this.newReview.comment.trim()) {
+      alert('Please fill in your review');
+      return;
+    }
+
+    const review: Review = {
+      productId: this.product()!.id!,
+      userId: 1, // This should come from auth service
+      rating: this.newReview.rating,
+      comment: this.newReview.comment
+    };
+
+    this.reviewService.createReview(review).subscribe({
+      next: (newReview) => {
+        this.reviews.set([...this.reviews(), newReview]);
+        this.newReview = { rating: 5, comment: '' };
+      },
+      error: (err) => console.error('Error submitting review:', err)
+    });
+  }
+
+  averageRating() {
+    if (this.reviews().length === 0) return 0;
+    const sum = this.reviews().reduce((acc, r) => acc + r.rating, 0);
+    return (sum / this.reviews().length).toFixed(1);
+  }
+
+  getStars(rating: number): string {
+    return '⭐'.repeat(rating);
+  }
+
+  addToCart() {
+    alert(`Added "${this.product()!.name}" to cart! 🛒`);
+  }
+}

@@ -9,7 +9,7 @@ import { UserResponseDto, ProductResponseDto, ReviewResponseDto, OrderResponseDt
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:8080/api/v1';
+  private baseUrl = 'http://localhost:9090/api/v1';
 
   // State Management via Signals
   currentUser = signal<UserResponseDto | null>(null);

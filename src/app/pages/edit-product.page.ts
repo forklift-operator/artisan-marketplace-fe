@@ -1,0 +1,195 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ProductService, Product } from '../services/product.service';
+
+@Component({
+  selector: 'app-edit-product',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  template: `
+    <div class="min-h-screen bg-amber-50">
+      <!-- Header -->
+      <section class="bg-gradient-to-r from-amber-700 via-orange-700 to-red-700 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4">
+          <h1 class="text-4xl font-bold mb-2">✏️ Edit Product</h1>
+          <p class="text-amber-100">Update your product details</p>
+        </div>
+      </section>
+
+      <!-- Content -->
+      <div class="max-w-4xl mx-auto px-4 py-8">
+        <a routerLink="/vendor/dashboard" class="text-amber-700 hover:text-amber-900 font-bold mb-6 inline-block">
+          ← Back to Dashboard
+        </a>
+
+        <!-- Loading -->
+        <div *ngIf="loading()" class="text-center py-12">
+          <div class="text-5xl mb-4">⏳</div>
+          <p class="text-gray-600">Loading product...</p>
+        </div>
+
+        <!-- Form -->
+        <div *ngIf="!loading() && product()" class="card-artisan p-8">
+          <form (ngSubmit)="saveProduct()" class="space-y-6">
+            <!-- Product Name -->
+            <div>
+              <label class="block text-sm font-bold text-amber-900 mb-2">Product Name *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="product()!.name" 
+                name="name"
+                placeholder="e.g., Handmade Ceramic Vase"
+                required
+                class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+              >
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label class="block text-sm font-bold text-amber-900 mb-2">Description *</label>
+              <textarea 
+                [(ngModel)]="product()!.description" 
+                name="description"
+                placeholder="Tell customers about your product..."
+                rows="4"
+                required
+                class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+              ></textarea>
+              <p class="text-xs text-gray-500 mt-1">{{ product()!.description.length }}/500 characters</p>
+            </div>
+
+            <!-- Price & Quantity -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-bold text-amber-900 mb-2">Price (USD) *</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="product()!.price" 
+                  name="price"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  required
+                  class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+                >
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-amber-900 mb-2">Quantity in Stock *</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="product()!.quantity" 
+                  name="quantity"
+                  placeholder="1"
+                  min="0"
+                  required
+                  class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+                >
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div>
+              <label class="block text-sm font-bold text-amber-900 mb-2">Location *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="product()!.location" 
+                name="location"
+                placeholder="e.g., Sofia, Bulgaria"
+                required
+                class="w-full px-4 py-2 border-2 border-amber-200 rounded-lg focus:outline-none focus:border-amber-600 bg-white"
+              >
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4 pt-6 border-t-2 border-amber-200">
+              <a routerLink="/vendor/dashboard" class="btn-secondary font-bold py-3 px-6">
+                Cancel
+              </a>
+              <button 
+                type="submit"
+                [disabled]="saving()"
+                class="flex-1 btn-primary font-bold text-white py-3 px-6 disabled:opacity-50"
+              >
+                {{ saving() ? '💾 Saving...' : '✅ Save Changes' }}
+              </button>
+            </div>
+          </form>
+
+          <!-- Product Info -->
+          <div class="mt-8 p-6 bg-amber-50 rounded-lg border-2 border-amber-200">
+            <h3 class="font-bold text-amber-900 mb-3">📋 Product Info</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Product ID:</span>
+                <span class="font-bold text-amber-900">#{{ product()!.id }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Created:</span>
+                <span class="font-bold text-amber-900">{{ product()!.createdAt | date:'medium' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Last Updated:</span>
+                <span class="font-bold text-amber-900">{{ product()!.updatedAt | date:'medium' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class EditProductPage implements OnInit {
+  private productService = inject(ProductService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  product = signal<Product | null>(null);
+  loading = signal(false);
+  saving = signal(false);
+
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      const id = +params['id'];
+      this.loadProduct(id);
+    });
+  }
+
+  loadProduct(id: number) {
+    this.loading.set(true);
+    this.productService.getProductById(id).subscribe({
+      next: (data) => {
+        this.product.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading product:', err);
+        this.loading.set(false);
+        alert('Product not found!');
+        this.router.navigate(['/vendor/dashboard']);
+      }
+    });
+  }
+
+  saveProduct() {
+    if (!this.product() || !this.product()!.name || !this.product()!.description) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    this.saving.set(true);
+    this.productService.updateProduct(this.product()!.id!, this.product()!).subscribe({
+      next: () => {
+        this.saving.set(false);
+        alert('Product updated successfully! ✅');
+        this.router.navigate(['/vendor/dashboard']);
+      },
+      error: (err) => {
+        console.error('Error saving product:', err);
+        alert('Failed to update product. Please try again.');
+        this.saving.set(false);
+      }
+    });
+  }
+}
