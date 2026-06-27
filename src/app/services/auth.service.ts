@@ -36,7 +36,7 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post(`${this.apiUrl}/login`, credentials, { withCredentials: true }).pipe(
       tap(() => this.checkAuthStatus())
     );
   }
@@ -69,4 +69,9 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.currentUser.value !== null;
   }
+
+getLoggedInUserId(): number  {
+  const user = this.currentUser.value;
+  return user ? user.id : -1;
+}
 }
