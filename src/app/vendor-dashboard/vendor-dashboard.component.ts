@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ProductService, Product } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
+import { VendorService, VendorStatistics } from '../services/vendor.service';
 
 @Component({
   selector: 'app-vendor-dashboard',
@@ -13,9 +14,11 @@ import { AuthService } from '../services/auth.service';
 })
 export class VendorDashboardComponent {
 private productService = inject(ProductService);
+private vendorService = inject(VendorService);
   authService = inject(AuthService);
 
   products = signal<Product[]>([]);
+  stats = signal<VendorStatistics>({ totalProducts: 0, averageRating: 0 });
   showAddModal = signal(false);
   showEditModal = signal(false);
 
@@ -29,6 +32,7 @@ private productService = inject(ProductService);
 
   ngOnInit() {
     this.loadProducts();
+    this.loadStats();
   }
 
   loadProducts() {
@@ -41,8 +45,19 @@ private productService = inject(ProductService);
     });
   }
 
+loadStats() {
+    const vendorId = this.authService.getLoggedInUserId();
+    this.vendorService.getVendorStats(vendorId).subscribe({
+      next: (stats) => {
+        this.stats.set(stats);
+      },
+      error: (err) => console.error('Error loading vendor stats:', err)
+    });
+  }
+
   refreshProducts() {
     this.loadProducts();
+    this.loadStats();
   }
 
   editProduct(product: Product) {

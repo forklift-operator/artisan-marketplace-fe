@@ -18,7 +18,7 @@
           My Orders
         </a>
         <ng-container *ngIf="(authService.currentUser$ | async) as user">
-          <a *ngIf="user?.role === 'VENDOR'" routerLink="/vendor/dashboard" routerLinkActive="active-link" class="nav-item">
+          <a *ngIf="user?.role === 'VENDOR'" routerLink="/vendor-dashboard" routerLinkActive="active-link" class="nav-item">
             Dashboard
           </a>
           <a *ngIf="user?.role === 'ADMIN'" routerLink="/admin" routerLinkActive="active-link" class="nav-item">

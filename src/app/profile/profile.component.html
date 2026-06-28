@@ -25,27 +25,27 @@
           </h2>
         </div>
 
-        <div class="artisan-card p-large">
-          <h3 class="card-heading">📊 Quick Stats</h3>
-          <div class="stats-list">
-            <div class="stat-item">
-              <span class="stat-label">Total Orders:</span>
-<!--              <span class="stat-value">{{ stats.totalOrders }}</span>-->
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Reviews Given:</span>
-              <span class="stat-value">{{ stats.reviewsGiven }}</span>
-            </div>
-            <div *ngIf="user()!.role === 'VENDOR'" class="stat-item">
-              <span class="stat-label">Products Listed:</span>
-              <span class="stat-value">{{ stats.productsListed }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Member Since:</span>
-              <span class="stat-value">2024</span>
-            </div>
-          </div>
-        </div>
+<!--        <div class="artisan-card p-large">-->
+<!--          <h3 class="card-heading">📊 Quick Stats</h3>-->
+<!--          <div class="stats-list">-->
+<!--            <div class="stat-item">-->
+<!--              <span class="stat-label">Total Orders:</span>-->
+<!--&lt;!&ndash;              <span class="stat-value">{{ stats.totalOrders }}</span>&ndash;&gt;-->
+<!--            </div>-->
+<!--            <div class="stat-item">-->
+<!--              <span class="stat-label">Reviews Given:</span>-->
+<!--              <span class="stat-value">{{ stats.reviewsGiven }}</span>-->
+<!--            </div>-->
+<!--            <div *ngIf="user()!.role === 'VENDOR'" class="stat-item">-->
+<!--              <span class="stat-label">Products Listed:</span>-->
+<!--              <span class="stat-value">{{ stats.productsListed }}</span>-->
+<!--            </div>-->
+<!--            <div class="stat-item">-->
+<!--              <span class="stat-label">Member Since:</span>-->
+<!--              <span class="stat-value">2024</span>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
 
         <div class="artisan-card p-large actions-list">
           <button (click)="openModal()" class="btn btn-secondary btn-block">
