@@ -73,6 +73,7 @@ export class CartComponent implements OnInit {
 
   checkout() {
     const activeOrder = this.orderService.currentOrder();
+    console.log(activeOrder);
 
     if (!activeOrder || !activeOrder.id) {
       console.warn("No active order found to check out.");

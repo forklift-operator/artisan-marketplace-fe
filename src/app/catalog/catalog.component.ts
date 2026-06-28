@@ -56,6 +56,7 @@ export class CatalogComponent {
 
   addToCart(product: Product) {
     // delegate to OrderService so UI updates reactively
+    console.log(product)
     this.orderService.addItem(product.id!, product.name, product.price || 0, 1);
   }
 }

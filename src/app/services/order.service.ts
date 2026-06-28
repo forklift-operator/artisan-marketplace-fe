@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, concatMap, from, of, toArray, map } from 'rxjs';
 
 export interface OrderItem {
   productId: number;
@@ -31,21 +31,16 @@ export class OrderService {
   currentOrder: WritableSignal<Order | null> = signal(null);
   itemsSignal: WritableSignal<CartItem[]> = signal([]);
 
-  // Track if local cart changes have happened since the last server sync
   private hasPendingSyncChanges = false;
   private syncIntervalId: any;
 
   constructor(private http: HttpClient) {
-    // 1. Initialize from localStorage cache
     try {
       const raw = localStorage.getItem('cart');
       if (raw) this.itemsSignal.set(JSON.parse(raw));
     } catch {}
 
-    // 2. Fetch the initial server layout to grab the operational Order ID
     this.loadPendingOrder();
-
-    // 3. Start background sync cycle (10 mins = 10 * 60 * 1000 ms)
     this.startPeriodicSync(10 * 60 * 1000);
   }
 
@@ -57,8 +52,10 @@ export class OrderService {
     this.getPendingOrder().subscribe({
       next: (order) => {
         this.currentOrder.set(order);
-        // If local storage was empty, safely seed it with the server's state
-        if (this.itemsSignal().length === 0 && order.items?.length > 0) {
+        console.log('Loaded pending order:', order);
+
+        // FIX: Prioritize the server's items if they exist to keep data accurate across reloads
+        if (order.items && order.items.length > 0) {
           this.updateLocalStateFromOrder(order);
         }
       },
@@ -66,68 +63,80 @@ export class OrderService {
     });
   }
 
-  /**
-   * Periodic interval checking if local mutations need to flush to the server
-   */
   private startPeriodicSync(intervalMs: number) {
     if (this.syncIntervalId) clearInterval(this.syncIntervalId);
 
     this.syncIntervalId = setInterval(() => {
       if (this.hasPendingSyncChanges) {
-        console.log('⏳ 10-minute cycle triggered: Syncing cart modifications to backend...');
-        this.syncEntireCartToServer();
+        this.syncEntireCartToServer().subscribe();
       }
     }, intervalMs);
   }
 
   /**
-   * Loops through current local items and synchronously pushes updates sequentially
+   * FIX: Loops through local items and calls the update API sequentially.
+   * Returns an Observable containing the final server-side representation of the Order.
    */
-  private syncEntireCartToServer() {
+  private syncEntireCartToServer(): Observable<Order | null> {
     const itemsToSync = this.itemsSignal();
 
     if (itemsToSync.length === 0) {
       this.hasPendingSyncChanges = false;
-      return;
+      return of(this.currentOrder());
     }
 
-    // Process updates sequentially so Hibernate/Spring transactions do not conflict
-    let chain = new Observable<void>((sub) => { sub.next(); sub.complete(); });
+    console.log('🔄 Syncing cart modifications to backend sequentially...');
 
-    itemsToSync.forEach((item) => {
-      chain = chain.pipe(
-        tap(() => {
-          this.http.put<Order>(
-            `${this.apiUrl}/orders/update`,
-            { productId: Number(item.id), quantity: item.quantity },
-            { withCredentials: true }
-          ).subscribe({
-            next: (order) => this.currentOrder.set(order),
-            error: (err) => console.error(`Error syncing product ${item.id}:`, err)
-          });
-        })
-      );
-    });
-
-    chain.subscribe({
-      complete: () => {
-        this.hasPendingSyncChanges = false;
-        console.log('✅ Cart changes synced with backend server.');
-      }
-    });
+    return from(itemsToSync).pipe(
+      concatMap((item) => {
+        // Send the payload mapping matching your OrderUpdateRequestDto
+        return this.http.put<Order>(
+          `${this.apiUrl}/orders/update`,
+          { productId: Number(item.id), quantity: item.quantity },
+          { withCredentials: true }
+        );
+      }),
+      // toArray collects all emissions, allowing us to capture the final updated state cleanly
+      toArray(),
+      map((allResponses) => {
+        const finalOrderState = allResponses[allResponses.length - 1];
+        if (finalOrderState) {
+          this.currentOrder.set(finalOrderState);
+        }
+        return finalOrderState;
+      }),
+      tap({
+        finalize: () => {
+          this.hasPendingSyncChanges = false;
+          console.log('✅ All cart items updated successfully on the server.');
+        }
+      })
+    );
   }
 
-  // POST /api/v1/orders/{orderId}/complete
+  /**
+   * POST /api/v1/orders/{orderId}/complete
+   * FIX: Forces a complete checkout sync run right before calling completion
+   */
   completeOrder(orderId: number): Observable<Order> {
-    // FORCE SYNC right before checkout processing to guarantee matching totals
-    this.syncEntireCartToServer();
+    return this.syncEntireCartToServer().pipe(
+      concatMap((freshOrderState) => {
+        // Validation check against our fresh server data stream
+        if (!freshOrderState || !freshOrderState.items || freshOrderState.items.length === 0) {
+          throw new Error("Cannot complete checkout because your backend cart is empty.");
+        }
 
-    return this.http.post<Order>(`${this.apiUrl}/orders/${orderId}/complete`, {}, { withCredentials: true }).pipe(
+        return this.http.post<Order>(
+          `${this.apiUrl}/orders/${orderId}/complete`,
+          {},
+          { withCredentials: true }
+        );
+      }),
       tap(() => this.clearCart())
     );
   }
 
-  /* --- LOCAL OPERATIONAL MUTATIONS (No immediate API updates) --- */
+  /* --- LOCAL OPERATIONAL MUTATIONS --- */
 
   addItem(id: string | number, title: string | undefined, price: number, quantity = 1) {
     const sid = String(id);
@@ -148,7 +157,6 @@ export class OrderService {
     const itemToRemove = items[index];
     if (!itemToRemove) return;
 
-    // Send a zero quantity update immediately to the backend to drop it right away
     this.http.put<Order>(
       `${this.apiUrl}/orders/update`,
       { productId: Number(itemToRemove.id), quantity: 0 },
@@ -172,8 +180,10 @@ export class OrderService {
 
   private saveLocalCartState(items: CartItem[]) {
     this.itemsSignal.set(items);
-    this.hasPendingSyncChanges = true; // Flag for background timer
+    this.hasPendingSyncChanges = true;
     try { localStorage.setItem('cart', JSON.stringify(items)); } catch {}
+
+    this.syncEntireCartToServer().subscribe();
   }
 
   private updateLocalStateFromOrder(order: Order) {
