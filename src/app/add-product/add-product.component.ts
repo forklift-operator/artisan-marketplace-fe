@@ -11,7 +11,7 @@ import { ProductService, Product } from '../services/product.service';
   styleUrl: './add-product.component.css'
 })
 export class AddProductComponent {
-private productService = inject(ProductService);
+  private productService = inject(ProductService);
   private router = inject(Router);
 
   form = {
@@ -24,8 +24,26 @@ private productService = inject(ProductService);
     tags: ''
   };
 
+  selectedFiles: File[] = [];
+  previewUrls: string[] = [];
+
   loading = false;
   error = '';
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+    this.selectedFiles = Array.from(input.files);
+    this.previewUrls = [];
+
+    this.selectedFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.previewUrls.push(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
   onSubmit() {
     // Validation
@@ -47,15 +65,28 @@ private productService = inject(ProductService);
     this.loading = true;
     this.error = '';
 
-    const product: Product = {
+    // Use FormData with a JSON 'product' part and photos as files (backend expects @RequestPart("product") and @RequestPart("photos"))
+    const formData = new FormData();
+
+    const productDto: any = {
       name: this.form.name,
       description: this.form.description,
       price: this.form.price,
       quantity: this.form.quantity,
       location: this.form.location
     };
+    if (this.form.category) productDto.category = this.form.category;
+    if (this.form.tags) productDto.tags = this.form.tags;
 
-    this.productService.addProduct(product).subscribe({
+    // Append product JSON as a blob under key 'product' so Spring @RequestPart("product") can bind it
+    formData.append('product', new Blob([JSON.stringify(productDto)], { type: 'application/json' }));
+
+    // Append images under the 'photos' part (multiple allowed)
+    this.selectedFiles.forEach((file) => {
+      formData.append('photos', file, file.name);
+    });
+
+    this.productService.addProduct(formData).subscribe({
       next: (createdProduct) => {
         this.router.navigate(['/catalog']);
       },

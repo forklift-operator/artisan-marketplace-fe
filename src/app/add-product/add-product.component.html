@@ -116,6 +116,16 @@
           >
         </div>
 
+        <!-- Photos -->
+        <div>
+          <label class="block text-sm font-bold text-amber-900 mb-2">Photos</label>
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" multiple class="w-full" />
+
+          <div *ngIf="previewUrls.length > 0" class="grid grid-cols-4 gap-2 mt-3">
+            <img *ngFor="let src of previewUrls" [src]="src" class="h-24 w-24 object-cover rounded-md border-2 border-amber-100" />
+          </div>
+        </div>
+
         <!-- Error Message -->
         <div *ngIf="error" class="p-4 bg-red-50 border-2 border-red-200 rounded-lg text-red-700 text-sm">
           {{ error }}

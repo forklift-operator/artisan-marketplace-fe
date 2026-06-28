@@ -9,8 +9,15 @@ export interface Product {
   quantity: number;
   price: number;
   location: string;
+  photos?: Photo[]; // array of image URLs
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface Photo {
+  id?: number;
+  data: string;
+  contentType: string;
 }
 
 @Injectable({
@@ -38,12 +45,14 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
-  addProduct(product: Product): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product, {   withCredentials: true });
+  // Accept either JSON or FormData (for file uploads)
+  addProduct(product: Product | FormData): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product as any, { withCredentials: true });
   }
 
-  updateProduct(id: number, product: Product): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, product, { withCredentials: true });
+  // Accept FormData as well for updating photos
+  updateProduct(id: number, product: Product | FormData): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, product as any, { withCredentials: true });
   }
 
   deleteProduct(id: number): Observable<void> {

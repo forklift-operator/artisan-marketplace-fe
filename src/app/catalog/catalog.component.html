@@ -44,7 +44,9 @@
     <div *ngIf="!loading() && filteredProducts().length > 0" class="products-grid">
       <div *ngFor="let product of filteredProducts()" class="artisan-card">
         <div class="card-media">
-          🎨
+          <img *ngIf="product.photos && product.photos.length" [src]="'data:' + product.photos[0].contentType + ';base64,' + product.photos[0].data" alt="{{product.name}}"
+          width="200" height="200"/>
+          <div *ngIf="!product.photos || !product.photos.length" class="text-4xl">🎨</div>
         </div>
 
         <div class="card-body">
